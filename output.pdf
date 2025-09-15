@@ -1,1 +1,1 @@
-{"error":"PDF generation failed","details":"Error: The input directory \"C:\\Users\\Layobright\\Desktop\\enlists\\puppeteer-service\\node_modules\\@sparticuz\\chromium-min\\bin\" does not exist."}
+{"error":"PDF generation failed","details":"Error: The input directory \"/opt/render/project/src/node_modules/@sparticuz/chromium-min/bin\" does not exist."}

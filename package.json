@@ -4,7 +4,8 @@
     "type": "module",
     "scripts": {
         "start": "node server.js",
-        "dev": "NODE_ENV=development node server.js"
+        "dev": "NODE_ENV=development node server.js",
+        "postinstall": "chromium-install"
     },
     "dependencies": {
         "@sparticuz/chromium": "^138.0.2",
