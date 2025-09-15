@@ -5,7 +5,8 @@
     "scripts": {
         "start": "node server.js",
         "dev": "NODE_ENV=development node server.js",
-        "build": "yarn install --ignore-engines && echo Build complete"
+        "build": "yarn install --ignore-engines && echo Build complete",
+        "postinstall": "puppeteer install"
     },
     "dependencies": {
         "express": "^4.18.2",
