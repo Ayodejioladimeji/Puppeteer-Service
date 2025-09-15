@@ -1,43 +1,50 @@
 import express from "express";
-import puppeteer from "puppeteer-core";
-import chromium from "@sparticuz/chromium";
-
+import bodyParser from "body-parser";
+import puppeteer from "puppeteer";
 
 const app = express();
-
-app.use(express.json());
-
-async function launchBrowser() {
-    return puppeteer.launch({
-        args: chromium.args,
-        defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath(),
-        headless: chromium.headless,
-    });
-}
+app.use(bodyParser.json({ limit: "10mb" }));
 
 app.post("/generate-pdf", async (req, res) => {
-    try {
-        const { html } = req.body;
-        if (!html) return res.status(400).json({ error: "Provide html in body" });
+    const { html } = req.body;
 
-        const browser = await launchBrowser();
+    if (!html) {
+        return res.status(400).send("Missing HTML content");
+    }
+
+    try {
+        const browser = await puppeteer.launch({
+            headless: "new",
+            args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        });
         const page = await browser.newPage();
 
-        await page.setContent(html, { waitUntil: "networkidle0" });
+        // Set content and wait until all resources load
+        await page.setContent(html, {
+            waitUntil: ["domcontentloaded", "networkidle0"], // wait for fonts, CSS, etc.
+        });
 
-        const pdf = await page.pdf({ format: "A4", printBackground: true });
+        // Give extra time for Google Fonts to render
+        await page.evaluateHandle("document.fonts.ready");
+
+        const pdfBuffer = await page.pdf({
+            format: "A4",
+            printBackground: true,
+        });
+
         await browser.close();
 
         res.set({
             "Content-Type": "application/pdf",
-            "Content-Disposition": "attachment; filename=output.pdf",
+            "Content-Disposition": "inline; filename=cv.pdf",
         });
-        res.send(pdf);
+        res.send(pdfBuffer);
     } catch (err) {
-        console.error("PDF error:", err);
-        res.status(500).json({ error: "PDF generation failed", details: err.message });
+        console.error("PDF generation failed:", err);
+        res.status(500).send("Failed to generate PDF");
     }
 });
 
-app.listen(3000, () => console.log("PDF service running on port 3000"));
+app.listen(3000, () => {
+    console.log("Server running at http://localhost:3000");
+});
