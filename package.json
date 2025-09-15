@@ -9,7 +9,6 @@
     },
     "dependencies": {
         "@sparticuz/chromium": "^138.0.2",
-        "@sparticuz/chromium-min": "^133.0.0",
         "body-parser": "^1.20.3",
         "express": "^4.21.2",
         "puppeteer-core": "^24.20.0"

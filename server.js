@@ -1,6 +1,7 @@
 import express from "express";
 import puppeteer from "puppeteer-core";
-import chromium from "@sparticuz/chromium-min";
+import chromium from "@sparticuz/chromium";
+
 
 const app = express();
 
@@ -11,7 +12,7 @@ async function launchBrowser() {
         args: chromium.args,
         defaultViewport: chromium.defaultViewport,
         executablePath: await chromium.executablePath(),
-        headless: chromium.headless, // true on Render
+        headless: chromium.headless,
     });
 }
 
