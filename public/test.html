@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <form id="pdfForm">
+        <textarea id="htmlInput" rows="5" cols="40"><h1>Hello</h1><p>Test</p></textarea><br>
+        <button type="submit">Generate PDF</button>
+    </form>
+
+    <script>
+        document.getElementById("pdfForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const html = document.getElementById("htmlInput").value;
+
+            const res = await fetch("http://localhost:3000/generate-pdf", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ html }),
+            });
+
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "test.pdf";
+            a.click();
+            window.URL.revokeObjectURL(url);
+        });
+    </script>
+</body>
+
+</html>
