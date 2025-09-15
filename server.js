@@ -1,58 +1,62 @@
 import express from "express";
 import bodyParser from "body-parser";
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-core";
+import chromium from "@sparticuz/chromium-min";
 
 const app = express();
-const port = process.env.PORT || 3000;
-
 app.use(bodyParser.json({ limit: "10mb" }));
 
-// Allow CORS
+// Simple CORS
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Content-Type, x-api-key");
     res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    res.header("Access-Control-Allow-Headers", "Content-Type");
     if (req.method === "OPTIONS") return res.sendStatus(200);
     next();
 });
 
+async function launchBrowser() {
+    const execPath = await chromium.executablePath(); // ✅ Use sparticuz chromium path
+    return puppeteer.launch({
+        args: chromium.args,
+        executablePath: execPath,
+        headless: chromium.headless,
+        defaultViewport: null
+    });
+}
+
 app.post("/generate-pdf", async (req, res) => {
-    let browser = null;
     try {
-        const { html, url } = req.body;
+        const { html, url, filename = "document.pdf" } = req.body || {};
+        if (!html && !url) return res.status(400).json({ error: "Provide html or url" });
 
-        if (!html && !url) {
-            return res.status(400).json({ error: "Provide html or url in request body" });
-        }
+        const browser = await launchBrowser();
+        const page = await browser.newPage();
 
-        browser = await puppeteer.launch({
-            headless: true,
-            args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        if (html) await page.setContent(html, { waitUntil: "networkidle2" });
+        else await page.goto(url, { waitUntil: "networkidle2" });
+
+        try { await page.emulateMediaType("print"); } catch { }
+
+        const buffer = await page.pdf({
+            format: "A4",
+            printBackground: true,
+            preferCSSPageSize: true,
+            margin: { top: "0.5in", right: "0.5in", bottom: "0.5in", left: "0.5in" }
         });
 
-        const page = await browser.newPage();
-        if (html) {
-            await page.setContent(html, { waitUntil: "networkidle0" });
-        } else {
-            await page.goto(url, { waitUntil: "networkidle0" });
-        }
-
-        const pdfBuffer = await page.pdf({ format: "A4" });
-        // The browser is now closed in the `finally` block for reliability.
+        await page.close();
+        await browser.close();
 
         res.setHeader("Content-Type", "application/pdf");
-        res.setHeader("Content-Disposition", "attachment; filename=output.pdf");
-        res.setHeader("Content-Length", pdfBuffer.length);
-
-        return res.end(pdfBuffer);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "PDF generation failed", details: error.message });
-    } finally {
-        if (browser) {
-            await browser.close();
-        }
+        res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+        res.setHeader("Content-Length", buffer.length);
+        return res.end(buffer);
+    } catch (err) {
+        console.error("PDF error:", err);
+        res.status(500).json({ error: "PDF generation failed", details: String(err) });
     }
 });
 
-app.listen(port, () => console.log(`PDF service running at http://localhost:${port}`));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Listening on ${PORT}`));
