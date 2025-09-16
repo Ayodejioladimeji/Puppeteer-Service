@@ -1,13 +1,6 @@
-/**
- * @type {import("puppeteer").Configuration}
- */
 module.exports = {
-    // Download Chrome (default `skipDownload: false`).
-    chrome: {
-        skipDownload: false,
-    },
-    // Download Firefox (default `skipDownload: true`).
-    firefox: {
-        skipDownload: false,
-    },
+    defaultBrowser: 'chrome',
+    browsers: [
+        { name: 'chrome', revision: '140.0.7339.82' },
+    ],
 };

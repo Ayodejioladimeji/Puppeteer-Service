@@ -4,7 +4,8 @@
     "type": "module",
     "scripts": {
         "start": "node server.js",
-        "dev": "NODE_ENV=development node server.js"
+        "dev": "NODE_ENV=development node server.js",
+        "postinstall": "npx puppeteer browsers install chrome"
     },
     "dependencies": {
         "body-parser": "^1.20.2",
