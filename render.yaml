@@ -4,8 +4,6 @@ services:
     env: node
     buildCommand: npm install
     startCommand: node server.js
-    envVars:
-      PUPPETEER_CACHE_DIR: /opt/render/.cache/puppeteer
     disk:
       name: puppeteer-cache
       mountPath: /opt/render/.cache/puppeteer
