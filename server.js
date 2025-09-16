@@ -38,7 +38,16 @@ app.post("/generate-pdf", async (req, res) => {
             await page.goto(url, { waitUntil: "networkidle0" });
         }
 
-        const pdfBuffer = await page.pdf({ format: "A4" });
+        const pdfBuffer = await page.pdf({
+            format: "A4",
+            printBackground: true,
+            margin: {
+                top: "0.5in",
+                right: "0.5in",
+                bottom: "0.5in",
+                left: "0.5in",
+            },
+        })
         // The browser is now closed in the `finally` block for reliability.
 
         res.setHeader("Content-Type", "application/pdf");
