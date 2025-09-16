@@ -1,6 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
-import puppeteer from "puppeteer";
+import puppeteer, { executablePath } from "puppeteer";
+
 
 const app = express();
 const port = process.env.PORT || 3000;
