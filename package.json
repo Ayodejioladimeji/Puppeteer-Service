@@ -5,7 +5,7 @@
     "scripts": {
         "start": "node server.js",
         "dev": "NODE_ENV=development node server.js",
-        "postinstall": "npx puppeteer browsers install chrome"
+        "postinstall": "npx puppeteer browsers install chrome@140.0.7339.82"
     },
     "dependencies": {
         "body-parser": "^1.20.2",
