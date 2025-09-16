@@ -48,7 +48,6 @@ app.post("/generate-pdf", async (req, res) => {
                 left: "0.5in",
             },
         })
-        // The browser is now closed in the `finally` block for reliability.
 
         res.setHeader("Content-Type", "application/pdf");
         res.setHeader("Content-Disposition", "attachment; filename=output.pdf");
