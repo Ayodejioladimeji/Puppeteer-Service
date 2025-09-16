@@ -1,4 +1,9 @@
+const { join } = require('path');
+
+/**
+ * @type {import("puppeteer").Configuration}
+ */
 module.exports = {
-    defaultBrowser: 'chrome',
-    cacheDirectory: process.env.PUPPETEER_CACHE_DIR || '/opt/render/.cache/puppeteer',
+    // Changes the cache location for Puppeteer.
+    cacheDirectory: join(__dirname, '.cache', 'puppeteer'),
 };
